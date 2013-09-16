@@ -57,7 +57,7 @@ class XmppBot extends Adapter
     @robot.logger.info 'Hubot XMPP sent initial presence'
 
     @joinRoom room for room in @options.rooms
-    @initRoom room for room in @options.rooms
+    @unlockRoom room for room in @options.rooms
 
     # send raw whitespace for keepalive
     @keepaliveInterval = setInterval =>
@@ -76,15 +76,15 @@ class XmppBot extends Adapter
         password: if index > 0 then room.slice(index+1) else false
     return rooms
 
-  # XMPP create a instant room - http://xmpp.org/extensions/xep-0045.html#createroom-instant
-  initRoom: (room) ->
+  # XMPP unlock an instant room - http://xmpp.org/extensions/xep-0045.html#createroom-instant
+  unlockRoom: (room) ->
+    @robot.logger.info "Unlock room #{room.jid}"
+
     @client.send do =>
-      el = new Xmpp.Element('iq', to: room, type: 'set', id: 'create1')
+      el = new Xmpp.Element('iq', to: room.jid, type: 'set', id: 'create1')
 
       x = el.c('query', xmlns: 'http://jabber.org/protocol/muc#owner')
             .c('x', xmlns:'jabber:x:data', type:'submit')
-
-      @robot.logger.debug "Confirm instant room with message #{x.toString()}"
 
       return x
 
