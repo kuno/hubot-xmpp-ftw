@@ -67,6 +67,26 @@ class XmppBot extends Adapter
     @emit if @connected then 'reconnected' else 'connected'
     @connected = true
 
+  # Direct inviation - http://xmpp.org/extensions/xep-0249.html
+  directlyInvite: (invitor, invitee, room, reason) ->
+    @robot.logger.info "Directly invite user #{invitee} to room #{room}"
+
+    @client.send do =>
+        message = new Xmpp.Element('message', from: invitor, to: invitee)
+                          .c('x', xmlns: 'jabber:x:conference', jid: room, reason: reason)
+
+        return message
+  # Mediated invitation - http://xmpp.org/extensions/xep-0045.html#invite
+  mediatedInvite: (invitee, room, reason) ->
+    @robot.logger.info "Mediately invite user #{invitee} to room #{room}"
+
+    @client.send do =>
+      message = new Xmpp.Element('message', to: room)
+                        .c('x', xmlns: 'http://jabber.org/protocol/muc#user')
+                        .c('invite', to: invitee)
+                        .c('reason').t(reason)
+    return message
+
   parseRooms: (items) ->
     rooms = []
     for room in items
