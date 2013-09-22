@@ -68,7 +68,7 @@ class XmppBot extends Adapter
     @connected = true
 
   # Direct inviation - http://xmpp.org/extensions/xep-0249.html
-  directlyInvite: (invitor, invitee, room, reason) ->
+  directlyInvite: (invitor, invitee, room, reason='') ->
     @robot.logger.info "Directly invite user #{invitee} to room #{room}"
 
     @client.send do =>
@@ -78,7 +78,7 @@ class XmppBot extends Adapter
         return message
 
   # Mediated invitation - http://xmpp.org/extensions/xep-0045.html#invite
-  mediatedInvite: (invitee, room, reason) ->
+  mediatedInvite: (invitee, room, reason='') ->
     @robot.logger.info "Mediately invite user #{invitee} to room #{room}"
 
     @client.send do =>
@@ -98,14 +98,14 @@ class XmppBot extends Adapter
     return rooms
 
   # XMPP kick a occupant froma room - http://xmpp.org/extensions/xep-0045.html#kick
-  kickOccupant: (occupant, room, reason) ->
-    @robot.logger.info "Kicking user #{occupant} from room #{room}"
+  kickOccupant: (jid, room, reason='') ->
+    @robot.logger.info "Kicking occupant #{jid} from room #{room}"
 
     @client.send do =>
       el = new Xmpp.Element('iq', from: @client.jid, id:'kick1', to: room, type: 'set')
 
       x = el.c('query', xmlns:'http://jabber.org/protocol/muc#admin')
-            .c('item', nick:occupant, role:'none')
+            .c('item', jid:jid, role:'none')
             .c('reason').t(reason)
 
       return x
