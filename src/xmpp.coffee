@@ -85,7 +85,7 @@ class XmppBot extends Adapter
                         .c('x', xmlns: 'http://jabber.org/protocol/muc#user')
                         .c('invite', to: invitee)
                         .c('reason').t(reason)
-    return message
+      return message
 
   parseRooms: (items) ->
     rooms = []
