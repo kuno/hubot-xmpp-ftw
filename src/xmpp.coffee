@@ -76,6 +76,7 @@ class XmppBot extends Adapter
                           .c('x', xmlns: 'jabber:x:conference', jid: room, reason: reason)
 
         return message
+
   # Mediated invitation - http://xmpp.org/extensions/xep-0045.html#invite
   mediatedInvite: (invitee, room, reason) ->
     @robot.logger.info "Mediately invite user #{invitee} to room #{room}"
@@ -95,6 +96,19 @@ class XmppBot extends Adapter
         jid:      room.slice(0, if index > 0 then index else room.length)
         password: if index > 0 then room.slice(index+1) else false
     return rooms
+
+  # XMPP kick a occupant froma room - http://xmpp.org/extensions/xep-0045.html#kick
+  kickOccupant: (occupant, room, reason) ->
+    @robot.logger.info "Kicking user #{occupant} from room #{room}"
+
+    @client.send do =>
+      el = new Xmpp.Element('iq', from: @client.jid, id:'kick1', to: room, type: 'set')
+
+      x = el.c('query', xmlns:'http://jabber.org/protocol/muc#admin')
+            .c('item', nick:occupant, role:'none')
+            .c('reason').t(reason)
+
+      return x
 
   # XMPP unlock an instant room - http://xmpp.org/extensions/xep-0045.html#createroom-instant
   unlockRoom: (room) ->
@@ -308,4 +322,3 @@ class XmppBot extends Adapter
 
 exports.use = (robot) ->
   new XmppBot robot
-
