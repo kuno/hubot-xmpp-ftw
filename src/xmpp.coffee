@@ -110,6 +110,19 @@ class XmppBot extends Adapter
 
       return x
 
+  # XMPP destroy an instant room - http://xmpp.org/extensions/xep-0045.html#destroyroom
+  destroyRoom: (jid, room, reason='') ->
+    @robot.logger.info "Going to destroy room #{room}"
+
+    @client.send do =>
+      el = new Xmpp.Element('iq',to: room, type: "set", id: "destroy1")
+
+      x = el.c('query', xmlns:'http://jabber.org/protocol/muc#owner')
+            .c('destroy', jid: room)
+            .c('reason').t(reason)
+
+      return x
+
   # XMPP unlock an instant room - http://xmpp.org/extensions/xep-0045.html#createroom-instant
   unlockRoom: (room) ->
     @robot.logger.info "Unlock room #{room.jid}"
