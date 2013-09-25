@@ -111,7 +111,7 @@ class XmppBot extends Adapter
       return x
 
   # XMPP destroy an instant room - http://xmpp.org/extensions/xep-0045.html#destroyroom
-  destroyRoom: (jid, room, reason='') ->
+  destroyRoom: (room, reason='') ->
     @robot.logger.info "Going to destroy room #{room}"
 
     @client.send do =>
