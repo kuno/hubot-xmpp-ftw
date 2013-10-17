@@ -6,7 +6,7 @@ request = require 'request'
 
 _notify = (status) =>
   org = process.env.HUBOT_ORG_NAME
-  url = process.env.API_NOTIFY_URL
+  url = process.env.HUBOT_NOTIFY_URL
   username = process.env.API_AUTH_USERNAME
   password = process.env.API_AUTH_PASSWORD
 
@@ -91,7 +91,7 @@ class XmppBot extends Adapter
     @connected = true
 
   notify: (status) =>
-    @robot.logger.info "Notify to #{process.env.API_NOTIFY_URL} status #{status}"
+    @robot.logger.info "Notify to #{process.env.HUBOT_NOTIFY_URL} status #{status}"
 
     _notify status
 
