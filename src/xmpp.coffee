@@ -2,6 +2,7 @@
 
 Xmpp    = require 'node-xmpp'
 util    = require 'util'
+request = require 'request'
 
 class XmppBot extends Adapter
   run: ->
@@ -59,6 +60,9 @@ class XmppBot extends Adapter
     @joinRoom room for room in @options.rooms
     @unlockRoom room for room in @options.rooms
 
+    #
+    @notify 'online'
+
     # send raw whitespace for keepalive
     @keepaliveInterval = setInterval =>
       @client.send ' '
@@ -66,6 +70,25 @@ class XmppBot extends Adapter
 
     @emit if @connected then 'reconnected' else 'connected'
     @connected = true
+
+  notify: (status) =>
+    org = process.env.HUBOT_ORG_NAME
+    url = process.env.API_NOTIFY_URL
+    username = process.env.API_AUTH_USERNAME
+    password = process.env.API_AUTH_PASSWORD
+
+    #
+    if (org and url and username and password)
+      request.get
+        uri:
+          url
+        qs:
+          org: org
+          status: status
+          timestamp: Date.now()
+        auth:
+          username: username
+          password: password
 
   # Direct inviation - http://xmpp.org/extensions/xep-0249.html
   directlyInvite: (invitor, invitee, room, reason='') ->
@@ -226,7 +249,7 @@ class XmppBot extends Adapter
         from = stanza.getChild('x', 'http://jabber.org/protocol/muc#user')?.getChild('item')?.attrs?.jid
       return from
 
-    switch stanza.attrs.type
+    switch stanza.atrs.type
       when 'subscribe'
         @robot.logger.debug "#{stanza.attrs.from} subscribed to me"
 
@@ -332,6 +355,8 @@ class XmppBot extends Adapter
   offline: =>
     @robot.logger.debug "Received offline event"
     clearInterval(@keepaliveInterval)
+
+    @notify('offline')
 
 exports.use = (robot) ->
   new XmppBot robot
