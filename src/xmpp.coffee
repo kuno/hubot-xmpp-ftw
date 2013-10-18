@@ -4,7 +4,7 @@ Xmpp    = require 'node-xmpp'
 util    = require 'util'
 request = require 'request'
 
-_notify = (status) =>
+_notify = (status) ->
   org = process.env.HUBOT_ORG_NAME
   url = process.env.HUBOT_NOTIFY_URL
   username = process.env.API_AUTH_USERNAME
