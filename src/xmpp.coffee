@@ -1,27 +1,29 @@
 {Adapter,Robot,TextMessage,EnterMessage,LeaveMessage} = require 'hubot'
 
-Xmpp    = require 'node-xmpp'
+url     = require 'url'
 util    = require 'util'
-request = require 'request'
+http    = require 'http'
+Xmpp    = require 'node-xmpp'
 
 _notify = (status) ->
   org = process.env.HUBOT_ORG_NAME
-  url = process.env.HUBOT_NOTIFY_URL
+  notifyUrl = process.env.HUBOT_NOTIFY_URL
   username = process.env.API_AUTH_USERNAME
   password = process.env.API_AUTH_PASSWORD
 
   #
-  if (org and url and username and password)
-    request.get
-      uri:
-        url
-      qs:
-        org: org
-        status: status
-        timestamp: Date.now()
+  if (org and notifyUrl and username and password)
+    urlObj = url.parse(notifyUrl)
+
+    http.get
+      hostname:
+        urlObj.hostname
+      port:
+        urlObj.port
+      path:
+        urlObj.pathname + '?org=' + org + '&status=' + status + '&timestamp=' + Date.now()
       auth:
-        username: username
-        password: password
+        username + ':' + password
 
 class XmppBot extends Adapter
   run: ->
