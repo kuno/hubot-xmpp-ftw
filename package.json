@@ -1,5 +1,5 @@
 {
-  "name": "hubot-xmpp",
+  "name": "hubot-wiredcraft-xmpp",
   "version": "0.1.7",
   "author": "Mark Story <mark@mark-story.com> (http://mark-story.com)",
   "description": "XMPP adapter for Hubot.",
