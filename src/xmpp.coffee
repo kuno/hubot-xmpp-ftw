@@ -110,7 +110,7 @@ class XmppBot extends Adapter
   notify: (status) =>
     @robot.logger.info "Notify to #{process.env.HUBOT_NOTIFY_URL} status #{status}"
 
-    _notify @robot, status
+    #_notify @robot, status
 
   # Direct inviation - http://xmpp.org/extensions/xep-0249.html
   directlyInvite: (invitor, invitee, room, reason='') ->
