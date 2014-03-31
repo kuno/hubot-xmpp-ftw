@@ -19,6 +19,7 @@ _notify = (robot, status) ->
     urlObj = url.parse(notifyUrl)
     parameters = "#{urlObj.pathname}?org=#{org}&status=#{status}&timestamp=#{now}&jid=#{jid}"
     auth = "#{username}:#{password}"
+    port = parseInt urlObj.port
 
     robot.logger.info "Going to notify api status"
     robot.logger.info util.inspect(urlObj)
@@ -29,8 +30,9 @@ _notify = (robot, status) ->
     robot.logger.info "Api password: #{password}"
     robot.logger.info "Parameters: #{parameters}"
     robot.logger.info "Auth: #{auth}"
+    robot.logger.info "Port: #{port}"
 
-    http.get
+    http.get(
       hostname:
         urlObj.hostname
       port:
@@ -39,6 +41,10 @@ _notify = (robot, status) ->
         parameters
       auth:
         auth
+    ).on 'error', (err) ->
+        robot.logger.error err.toString()
+
+    return
 
 class XmppBot extends Adapter
   run: ->
