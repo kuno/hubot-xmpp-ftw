@@ -97,7 +97,7 @@ class XmppBot extends Adapter
     @unlockRoom room for room in @options.rooms
 
     #
-    @notify 'online'
+    #@notify 'online'
 
     # send raw whitespace for keepalive
     @keepaliveInterval = setInterval =>
@@ -110,7 +110,7 @@ class XmppBot extends Adapter
   notify: (status) =>
     @robot.logger.info "Notify to #{process.env.HUBOT_NOTIFY_URL} status #{status}"
 
-    #_notify @robot, status
+    _notify @robot, status
 
   # Direct inviation - http://xmpp.org/extensions/xep-0249.html
   directlyInvite: (invitor, invitee, room, reason='') ->
@@ -378,7 +378,7 @@ class XmppBot extends Adapter
     @robot.logger.debug "Received offline event"
     clearInterval(@keepaliveInterval)
 
-    @notify 'offline'
+    #@notify 'offline'
 
 exports.use = (robot) ->
   new XmppBot robot
