@@ -5,15 +5,30 @@ util    = require 'util'
 http    = require 'http'
 Xmpp    = require 'node-xmpp'
 
-_notify = (status) ->
+#
+_notify = (robot, status) ->
+  jid = process.env.HUBOT_XMPP_USERNAME
   org = process.env.HUBOT_ORG_NAME
   notifyUrl = process.env.HUBOT_NOTIFY_URL
   username = process.env.API_AUTH_USERNAME
   password = process.env.API_AUTH_PASSWORD
+  now = Date.now()
 
   #
-  if (org and notifyUrl and username and password)
+  if (jid and org and notifyUrl and username and password)
     urlObj = url.parse(notifyUrl)
+    parameters = "#{urlObj.pathname}?org=#{org}&status=#{status}&timestamp=#{now}&jid=#{jid}"
+    auth = "#{username}:#{password}"
+
+    robot.logger.info "Going to notify api status"
+    robot.logger.info util.inspect(urlObj)
+    robot.logger.info "Status: #{status}"
+    robot.logger.info "Org: #{org}"
+    robot.logger.info "Jid: #{jid}"
+    robot.logger.info "Api username: #{username}"
+    robot.logger.info "Api password: #{password}"
+    robot.logger.info "Parameters: #{parameters}"
+    robot.logger.info "Auth: #{auth}"
 
     http.get
       hostname:
@@ -21,9 +36,9 @@ _notify = (status) ->
       port:
         urlObj.port
       path:
-        urlObj.pathname + '?org=' + org + '&status=' + status + '&timestamp=' + Date.now()
+        parameters
       auth:
-        username + ':' + password
+        auth
 
 class XmppBot extends Adapter
   run: ->
@@ -82,7 +97,7 @@ class XmppBot extends Adapter
     @unlockRoom room for room in @options.rooms
 
     #
-    #@notify 'online'
+    @notify 'online'
 
     # send raw whitespace for keepalive
     @keepaliveInterval = setInterval =>
@@ -95,7 +110,7 @@ class XmppBot extends Adapter
   notify: (status) =>
     @robot.logger.info "Notify to #{process.env.HUBOT_NOTIFY_URL} status #{status}"
 
-    _notify status
+    _notify @robot, status
 
   # Direct inviation - http://xmpp.org/extensions/xep-0249.html
   directlyInvite: (invitor, invitee, room, reason='') ->
@@ -363,7 +378,7 @@ class XmppBot extends Adapter
     @robot.logger.debug "Received offline event"
     clearInterval(@keepaliveInterval)
 
-    #@notify 'offline'
+    @notify 'offline'
 
 exports.use = (robot) ->
   new XmppBot robot
